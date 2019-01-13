@@ -273,8 +273,6 @@ BUILD_PATH=".build_ios/${BUILD_MODE}"
 PRODUCT_PATH="${BUILD_PATH}/${PRODUCT_DIR}"
 PRODUCT_APP_PATH="${PRODUCT_PATH}/Flutter"
 
-./gen_config.sh
-
 start_build
 
 exit 0

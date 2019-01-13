@@ -1,0 +1,4 @@
+[submodule "Example/my_flutter/.flutter"]
+	path = Example/my_flutter/.flutter
+	url = https://github.com/flutter/flutter.git
+	branch = stable

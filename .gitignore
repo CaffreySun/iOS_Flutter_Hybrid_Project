@@ -1,7 +1,8 @@
 .DS_Store
 .dart_tool/
 .flutter/
-Pod/
+Pods/
+.build_ios/
 
 .packages
 .pub/
