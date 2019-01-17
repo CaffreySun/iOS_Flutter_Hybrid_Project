@@ -19,8 +19,8 @@ FLUTTER_APP_URL="gut://xxx.git"
 # 如果指定了FLUTTER_APP_PATH，则此配置失效
 FLUTTER_APP_BRANCH="master"
 
-# flutter本地工程目录，绝对路径或者相对路径，如果有值则git相关的配置无效
-FLUTTER_APP_PATH="../my_flutter"
+# flutter本地工程目录，绝对路径或者相对路径，如果 != nil 则git相关的配置无效
+FLUTTER_APP_PATH=nil
 
 =end
 # 

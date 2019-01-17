@@ -25,7 +25,7 @@ FLUTTER_APP_URL="ssh://gerrit.yimi.com:29418/flutter-client"
 # 如果指定了FLUTTER_APP_PATH，则此配置失效
 FLUTTER_APP_BRANCH="master"
 
-# flutter本地工程目录，绝对路径或者相对路径，如果有值则git相关的配置无效
-FLUTTER_APP_PATH="../yimi_flutter"
+# flutter本地工程目录，绝对路径或者相对路径，如果 != nil 则git相关的配置无效
+FLUTTER_APP_PATH=nil
 
 eval(File.read(File.join(__dir__, 'flutterhelper.rb')), binding)
