@@ -19,8 +19,11 @@ FLUTTER_APP_URL="gut://xxx.git"
 # 如果指定了FLUTTER_APP_PATH，则此配置失效
 FLUTTER_APP_BRANCH="master"
 
-# flutter本地工程目录，绝对路径或者相对路径，如果 != nil 则git相关的配置无效
+# flutter本地工程目录，绝对路径或者相对路径，
+# FLUTTER_DEBUG_APP == false时才有效，如果 != nil 则git相关的配置无效
 FLUTTER_APP_PATH=nil
+
+eval(File.read(File.join(__dir__, 'flutterhelper.rb')), binding)
 
 =end
 # 
@@ -178,7 +181,8 @@ def install_release_flutter_app_pod(product_path)
     puts "将 flutter app 通过 pod 导入到 工程"
 
     Dir.foreach product_path do |sub|
-        if sub.eql?('.') || sub.eql?('..') 
+        # 忽略隐藏文件夹
+        if sub =~ /\.(.*)/ 
             next
         end
 
