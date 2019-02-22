@@ -13,8 +13,8 @@
 1. 使用`flutter create -t module my_flutter`创建 Flutter Module 工程。
 2. 复制"Script/git/Flutter"目录内的所有文件到 Flutter 工程根目录.
 3. 修改复制的 build_ios.sh 里参数"PRODUCT_GIT_DIR"，使其指向用来保存产物的git仓库的路径，**是路径** 不是git地址。
-4. 复制"Script/Maven/Native"中除了Podfile外的文件到 Native 根目录。
-5. 复制"Script/Maven/Native/Podfile"文件内 "end" 后面的配置内容到自己 Native 工程的 Podfile。并根据自己的工程修改配置。
+4. 复制"Script/git/Native"中除了Podfile外的文件到 Native 根目录。
+5. 复制"Script/git/Native/Podfile"文件内 "end" 后面的配置内容到自己 Native 工程的 Podfile。并根据自己的工程修改配置。
 6. 在Flutter工程目录下使用 build_ios.sh -m release/debug 进行打包，会自动将产物复制到git仓库目录，并执行git push。
 7. 在Native工程执行 pod install，会自动从git拉取产物并安装。
 
