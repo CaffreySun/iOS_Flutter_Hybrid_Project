@@ -6,26 +6,22 @@ target 'my_native' do
   # use_frameworks!
 
   # Pods for TestMoreFlutter
-
 end
 
-
-# 设置要引入的 flutter app 的版本
-FLUTTER_APP_VERSION="4.01.01"
-
 # 是否进行调试 flutter app，
-# 为true时FLUTTER_APP_VERSION配置失效，下面的三项配置生效
-# 为false时FLUTTER_APP_VERSION配置生效，下面的三项配置失效
-FLUTTER_DEBUG_APP=true
+# 为true时，为使用产物的方式从下面git地址拉取产物
+# 为false时，为使用源码的方式从下面git地址拉取源码
+FLUTTER_DEBUG_APP = true
 
 # Flutter App git地址，从git拉取的内容放在当前工程目录下的.flutter/app目录
 # 如果指定了FLUTTER_APP_PATH，则此配置失效
-FLUTTER_APP_URL="ssh://gerrit.yimi.com:29418/flutter-client"
+FLUTTER_APP_URL = 'gut://xxx.git'
 # flutter git 分支，默认为master
 # 如果指定了FLUTTER_APP_PATH，则此配置失效
-FLUTTER_APP_BRANCH="master"
+FLUTTER_APP_BRANCH = 'master'
 
-# flutter本地工程目录，绝对路径或者相对路径，如果有值则git相关的配置无效
-FLUTTER_APP_PATH="../my_flutter"
+# flutter本地工程目录，绝对路径或者相对路径，
+# FLUTTER_DEBUG_APP == false时才有效，如果 != nil 则git相关的配置无效
+FLUTTER_APP_PATH = '../my_flutter'
 
 eval(File.read(File.join(__dir__, 'flutterhelper.rb')), binding)

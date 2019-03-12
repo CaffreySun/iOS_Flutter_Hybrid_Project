@@ -4,12 +4,9 @@
 # 你需要在 Podfile 添加以下=begin =end 之间的内容：
 =begin 
 
-# 设置要引入的 flutter app 的版本
-FLUTTER_APP_VERSION="4.01.01"
-
 # 是否进行调试 flutter app，
-# 为true时FLUTTER_APP_VERSION配置失效，下面的配置生效
-# 为false时FLUTTER_APP_VERSION配置生效，下面的配置失效
+# 为true时，为使用产物的方式从下面git地址拉取产物
+# 为false时，为使用源码的方式从下面git地址拉取源码
 FLUTTER_DEBUG_APP=false
 
 # Flutter App git地址，从git拉取的内容放在当前工程目录下的.flutter/app目录
@@ -19,8 +16,11 @@ FLUTTER_APP_URL="gut://xxx.git"
 # 如果指定了FLUTTER_APP_PATH，则此配置失效
 FLUTTER_APP_BRANCH="master"
 
-# flutter本地工程目录，绝对路径或者相对路径，如果有值则git相关的配置无效
-FLUTTER_APP_PATH="../my_flutter"
+# flutter本地工程目录，绝对路径或者相对路径，
+# FLUTTER_DEBUG_APP == false时才有效，如果 != nil 则git相关的配置无效
+FLUTTER_APP_PATH=nil
+
+eval(File.read(File.join(__dir__, 'flutterhelper.rb')), binding)
 
 =end
 # 
@@ -90,85 +90,6 @@ def install_debug_flutter_app
     end
 end
 
-# 解压flutter app file
-def unzip_release_flutter_fill(zip_file, package_unzip, package_path)
-    if package_path.nil? || package_path.nil? || package_path.nil?
-        return false
-    end
-
-    puts "开始解压 flutter app #{zip_file}"
-
-    # 删除标志物
-    FileUtils.rm_rf(package_unzip)
-    # 解压
-    `unzip #{zip_file} -d #{package_path}`
-    if $?.to_i == 0
-        # 解压成功，创建标志物
-        FileUtils.touch(package_unzip)
-        
-        return true
-    else
-        return false
-    end
-end
-
-# 解压flutter app
-def unzip_release_flutter_app(package_path, zip_file)
-    # 产物包已解压标志
-    flutter_package_unzip = File.join(package_path, "unzip.ok")
-    # 产物包解压后的目录
-    flutter_package_path = File.join(package_path, "product")
-    
-    if File.exist? flutter_package_unzip
-        if File.exist? flutter_package_path
-            return flutter_package_path
-        else
-            unziped = unzip_release_flutter_fill(zip_file, flutter_package_unzip, package_path)
-            if unziped == true
-                return flutter_package_path
-            else
-                raise "Error: Flutter app 解压失败 #{zip_file}"
-            end
-        end
-    else
-        FileUtils.rm_rf(flutter_package_path)
-        unziped = unzip_release_flutter_fill(zip_file, flutter_package_unzip, package_path)
-        if unziped == true
-            return flutter_package_path
-        else
-            raise "Error: Flutter app 解压失败 #{zip_file}"
-        end
-    end
-end
-
-# 下载 release 产物
-def download_release_flutter_app(app_version, download_path, downloaded_file) 
-
-    if app_version.nil? || download_path.nil?
-        raise "Error: 请在 Podfile 里设置要安装的 Flutter app 版本 ，例如：FLUTTER_APP_VERSION='1.0.0'"
-    end
-
-    if download_path.nil?
-        raise "Error: 无效的下载路径"
-    end
-
-    if downloaded_file.nil?
-        raise "Error: 无效的下载产物路径"
-    end
-
-    puts "开始下载 #{app_version} 版本 flutter app"
-    `./maven.sh download #{app_version}`
-
-    if $?.to_i == 0
-        # 移动产物
-        FileUtils.mv('flutter.zip', download_path)
-        # 下载成功，创建标志物
-        FileUtils.touch(downloaded_file)
-    else
-        raise "Error: 下载失败  #{app_version} 版本 flutter app"
-    end
-end
-
 # 将 Flutter app 通过 pod 安装
 def install_release_flutter_app_pod(product_path)
     if product_path.nil?
@@ -178,7 +99,8 @@ def install_release_flutter_app_pod(product_path)
     puts "将 flutter app 通过 pod 导入到 工程"
 
     Dir.foreach product_path do |sub|
-        if sub.eql?('.') || sub.eql?('..') 
+        # 忽略隐藏文件
+        if sub =~ /\.(.*)/ 
             next
         end
 
@@ -195,61 +117,27 @@ def install_release_flutter_app_pod(product_path)
     end
 end 
 
-
 # 安装正式环境环境app
 def install_release_flutter_app
-    if FLUTTER_APP_VERSION.nil?
-        raise "Error: 请在 Podfile 里设置要安装的 Flutter app 版本 ，例如：FLUTTER_APP_VERSION='1.0.0'"
-    else
-        puts "当前安装的 flutter app 版本为 #{FLUTTER_APP_VERSION}"
+    if FLUTTER_APP_URL.nil?
+        raise "Error: 请在 Podfile 里设置要安装的 Flutter app 的产物地址 ，例如：FLUTTER_APP_URL='git://xxx'"
     end
+
+    flutter_app_url = FLUTTER_APP_URL
 
     # 存放产物的目录
     flutter_release_path = File.expand_path('.flutter_release')
-    has_version_file = true
-    if !File.exist? flutter_release_path
-        FileUtils.mkdir_p(flutter_release_path)
-        has_version_file = false
-    end
 
-    # 存放当前版本产物的目录
-    flutter_release_version_path = File.join(flutter_release_path, FLUTTER_APP_VERSION)
-    if !File.exist? flutter_release_version_path
-        FileUtils.mkdir_p(flutter_release_version_path)
-        has_version_file = false
-    end
+    flutter_app_branch = FLUTTER_APP_BRANCH
 
-    # 产物包
-    flutter_package = "flutter.zip"
-    flutter_release_zip_file =  File.join(flutter_release_version_path, flutter_package)
-    if !File.exist? flutter_release_zip_file
-        has_version_file = false
+    if FLUTTER_APP_BRANCH.nil?
+        flutter_app_branch = "master"
     end
+    
+    update_flutter_app(flutter_release_path, flutter_app_url, flutter_app_branch)
 
-    # 产物包下载完成标志
-    flutter_package_downloaded = File.join(flutter_release_version_path, "download.ok")
-    if !File.exist? flutter_package_downloaded
-        has_version_file = false
-    end
-
-    if has_version_file == true
-        # 解压
-        flutter_package_path = unzip_release_flutter_app(flutter_release_version_path, flutter_release_zip_file)
-        # 开始安装
-        install_release_flutter_app_pod(flutter_package_path)
-    else
-        # 删除老文件
-        FileUtils.rm_rf(flutter_release_zip_file)
-        # 删除标志物
-        FileUtils.rm_rf(flutter_package_downloaded)
-
-        # 下载
-        download_release_flutter_app(FLUTTER_APP_VERSION, flutter_release_zip_file, flutter_package_downloaded)
-        # 解压
-        flutter_package_path = unzip_release_flutter_app(flutter_release_version_path, flutter_release_zip_file)
-        # 开始安装
-        install_release_flutter_app_pod(flutter_package_path)
-    end
+    # 开始安装
+    install_release_flutter_app_pod(flutter_release_path)
 end
 
 if FLUTTER_DEBUG_APP.nil? || FLUTTER_DEBUG_APP == false
