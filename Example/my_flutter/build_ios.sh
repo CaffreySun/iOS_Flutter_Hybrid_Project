@@ -9,6 +9,8 @@ PRODUCT_ZIP="product.zip"
 BUILD_PATH=".build_ios/${BUILD_MODE}"
 PRODUCT_PATH="${BUILD_PATH}/${PRODUCT_DIR}"
 PRODUCT_APP_PATH="${PRODUCT_PATH}/Flutter"
+# git repository path
+PRODUCT_GIT_DIR="/xx/xx/x"
 
 usage() {
     echo
@@ -144,18 +146,15 @@ build_flutter_app() {
         EchoError "Failed to build flutter assets"
         exit -1
     fi
-
-    local product_app_assets_path="${PRODUCT_APP_PATH}/Assets"
-    mkdir -p -- "${product_app_assets_path}"
-    cp -rf -- "${BUILD_PATH}/flutter_assets" "${PRODUCT_APP_PATH}/Assets"
+    
+    cp -rf -- "${BUILD_PATH}/flutter_assets" "${PRODUCT_APP_PATH}/App.framework"
 
     # setting podspec
     # replace:
     # 'Flutter.framework'
     # to:
     # 'Flutter.framework', 'App.framework'
-    #   s.resource='Assets/*'
-    sed -i '' -e $'s/\'Flutter.framework\'/\'Flutter.framework\', \'App.framework\'\\\n  s.resource=\'Assets\/*\'/g' ${PRODUCT_APP_PATH}/Flutter.podspec
+    sed -i '' -e $'s/\'Flutter.framework\'/\'Flutter.framework\', \'App.framework\'/g' ${PRODUCT_APP_PATH}/Flutter.podspec
 
     echo "Finish build flutter app"
 }
@@ -194,38 +193,24 @@ flutter_copy_packages() {
     echo "Finish copy flutter app plugin"
 }
 
-zip_product() {
+upload_product() {
     echo "================================="
-    echo "Start zip product"
+    echo "upload product"
 
-    pushd ${BUILD_PATH}
-    zip -r "${PRODUCT_ZIP}" "${PRODUCT_DIR}"
-    if [[ $? -ne 0 ]]; then
-        EchoError "Failed to zip product"
-        exit -1
-    fi
+    echo "${PRODUCT_APP_PATH}"
+    echo "${PRODUCT_GIT_DIR}"
 
-    popd
-
-    echo "Finish zip product"
-}
-
-maven_upload() {
-    echo "================================="
-    echo "Start upload ${PRODUCT_ZIP} to maven"
+    cp -r -f -- "${PRODUCT_APP_PATH}" "${PRODUCT_GIT_DIR}"
 
     local app_version=$(./get_version.sh)
 
-    echo "Upload version: ${app_version}"
+    pushd ${PRODUCT_GIT_DIR}
+    
+    git add .
+    git commit -m "Flutter product ${app_version}"
+    git push
 
-    ./maven.sh upload ${app_version} ${BUILD_PATH}/${PRODUCT_ZIP}
-
-    if [[ $? -ne 0 ]]; then
-        EchoError "Failed to upload maven"
-        exit -1
-    fi
-
-    echo "Finish upload ${PRODUCT_ZIP} to maven"
+    popd    
 }
 
 start_build() {
@@ -239,10 +224,7 @@ start_build() {
     flutter_copy_packages
 
     if [[ "${BUILD_MODE}" == "release" ]]; then
-
-        zip_product
-
-        maven_upload
+        upload_product
     fi
 
     echo ""

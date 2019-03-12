@@ -145,17 +145,14 @@ build_flutter_app() {
         exit -1
     fi
 
-    local product_app_assets_path="${PRODUCT_APP_PATH}/Assets"
-    mkdir -p -- "${product_app_assets_path}"
-    cp -rf -- "${BUILD_PATH}/flutter_assets" "${PRODUCT_APP_PATH}/Assets"
+    cp -rf -- "${BUILD_PATH}/flutter_assets" "${PRODUCT_APP_PATH}/App.framework"
 
     # setting podspec
     # replace:
     # 'Flutter.framework'
     # to:
     # 'Flutter.framework', 'App.framework'
-    #   s.resource='Assets/*'
-    sed -i '' -e $'s/\'Flutter.framework\'/\'Flutter.framework\', \'App.framework\'\\\n  s.resource=\'Assets\/*\'/g' ${PRODUCT_APP_PATH}/Flutter.podspec
+    sed -i '' -e $'s/\'Flutter.framework\'/\'Flutter.framework\', \'App.framework\'/g' ${PRODUCT_APP_PATH}/Flutter.podspec
 
     echo "Finish build flutter app"
 }

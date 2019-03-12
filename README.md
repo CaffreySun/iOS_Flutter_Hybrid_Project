@@ -1,6 +1,7 @@
 # iOS_Flutter_Hybrid_Project
 
-[![](https://badge.juejin.im/entry/5c3afcf26fb9a049f1546e7d/likes.svg?style=flat-square)](https://juejin.im/post/5c3ae5ef518825242165c5ca) [![Join the chat at https://gitter.im/iOS_Flutter_Hybrid_Project/community](https://badges.gitter.im/iOS_Flutter_Hybrid_Project/community.svg)](https://gitter.im/iOS_Flutter_Hybrid_Project/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![](https://badge.juejin.im/entry/5c3afcf26fb9a049f1546e7d/likes.svg?style=flat-square)](https://juejin.im/post/5c3ae5ef518825242165c5ca)
+[![Gitter](https://badges.gitter.im/iOS_Flutter_Hybrid_Project/community.svg)](https://gitter.im/iOS_Flutter_Hybrid_Project/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 [从零搭建 iOS Native Flutter 混合工程](https://juejin.im/post/5c3ae5ef518825242165c5ca)
 ## 使用说明
