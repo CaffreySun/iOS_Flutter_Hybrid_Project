@@ -11,8 +11,8 @@ end
 
 
 # 是否进行调试 flutter app，
-# 为true时，为使用产物的方式从下面git地址拉取产物
-# 为false时，为使用源码的方式从下面git地址拉取源码
+# 为false时，为使用产物的方式从下面git地址拉取产物
+# 为true时，为使用源码的方式从下面git地址拉取源码
 FLUTTER_DEBUG_APP=false
 
 # Flutter App git地址，从git拉取的内容放在当前工程目录下的.flutter/app目录
@@ -23,7 +23,7 @@ FLUTTER_APP_URL="gut://xxx.git"
 FLUTTER_APP_BRANCH="master"
 
 # flutter本地工程目录，绝对路径或者相对路径，
-# FLUTTER_DEBUG_APP == false时才有效，如果 != nil 则git相关的配置无效
+# FLUTTER_DEBUG_APP == true时才有效，如果 != nil 则git相关的配置无效
 FLUTTER_APP_PATH=nil
 
 eval(File.read(File.join(__dir__, 'flutterhelper.rb')), binding)
