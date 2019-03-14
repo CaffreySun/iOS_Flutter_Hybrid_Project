@@ -200,7 +200,7 @@ upload_product() {
     echo "${PRODUCT_PATH}"
     echo "${PRODUCT_GIT_DIR}"
 
-    cp -r -f -- "${PRODUCT_PATH}" "${PRODUCT_GIT_DIR}"
+    cp -r -f -- "${PRODUCT_PATH}/" "${PRODUCT_GIT_DIR}"
 
     local app_version=$(./get_version.sh)
 
