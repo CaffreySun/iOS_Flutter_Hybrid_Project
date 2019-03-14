@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "AppDelegate.h"
 #import <Flutter/Flutter.h>
 
 @interface ViewController ()
@@ -27,9 +28,15 @@
     [self.view addSubview:button];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:animated];
+}
+
 - (void)handleButtonAction {
-    FlutterViewController* flutterViewController = [[FlutterViewController alloc] init];
-    [self presentViewController:flutterViewController animated:false completion:nil];
+    FlutterEngine *flutterEngine = [(AppDelegate *)[[UIApplication sharedApplication] delegate] flutterEngine];
+    FlutterViewController *flutterViewController = [[FlutterViewController alloc] initWithEngine:flutterEngine nibName:nil bundle:nil];
+    [self.navigationController pushViewController:flutterViewController animated:YES];
 }
 
 
