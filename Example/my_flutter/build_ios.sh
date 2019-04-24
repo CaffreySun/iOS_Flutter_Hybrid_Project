@@ -94,6 +94,8 @@ build_flutter_app() {
 
         echo "Build archs: ${ARCHS_ARM}"
 
+        ${FLUTTER_ROOT}/bin/flutter clean
+
         # build fLutter app
         ${FLUTTER_ROOT}/bin/flutter --suppress-analytics \
             --verbose \
