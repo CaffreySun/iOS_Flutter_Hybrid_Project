@@ -28,3 +28,27 @@
 6. 修改 Native 工程目录里的 Maven.sh，将Maven服务器地址、用户名、项目地址改成自己的。
 7. 在Flutter工程下使用build_ios.sh -m release/debug 进行打包，会自动将产物上传到maven。
 8. 在Native工程执行 pod install，会自动从maven下载Flutter产物并安装。
+
+## 常见问题
+
+1、Release 模式签名错误，错误输出如下：
+```
+Xcode's output:
+↳
+    === BUILD TARGET Runner OF PROJECT Runner WITH CONFIGURATION Release ===
+    Code Signing Error: Failed to create provisioning profile. The app ID "com.example.myFlutter" cannot be registered to your development team. Change your bundle
+    identifier to a unique string to try again.
+    Code Signing Error: No profiles for 'com.example.myFlutter' were found:  Xcode couldn't find any iOS App Development provisioning profiles matching
+    'com.example.myFlutter'.
+    Code Signing Error: Code signing is required for product type 'Application' in SDK 'iOS 12.2'
+    Code Signing Error: Code signing is required for product type 'Application' in SDK 'iOS 12.2'
+    Code Signing Error: Code signing is required for product type 'Application' in SDK 'iOS 12.2'
+
+
+It appears that your application still contains the default signing identifier.
+Try replacing 'com.example' with your signing id in Xcode:
+  open ios/Runner.xcworkspace
+Encountered error while building for device.
+
+```
+请用xCode打开Flutter工程目录下的.ios/Runner.xcworkspace工程，然后修改BundleId为自己的BundleId，然后重新执行release编译。
