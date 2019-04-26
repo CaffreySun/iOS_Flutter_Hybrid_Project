@@ -94,28 +94,44 @@ build_flutter_app() {
 
         ${FLUTTER_ROOT}/bin/flutter clean
 
-        # build fLutter app
-        ${FLUTTER_ROOT}/bin/flutter --suppress-analytics \
-            --verbose \
-            build aot \
-            --output-dir="${BUILD_PATH}" \
-            --target-platform=ios \
-            --target="${target_path}" \
-            --${BUILD_MODE} \
-            --ios-arch="${ARCHS_ARM}"
-
+        ${FLUTTER_ROOT}/bin/flutter build ios --${BUILD_MODE}
         if [[ $? -ne 0 ]]; then
             EchoError "Failed to build flutter app"
             exit -1
         fi
+
+        cp -r -- ".ios/Flutter/App.framework" "${BUILD_PATH}/App.framework"
     else
         echo "Build archs: x86_64 ${ARCHS_ARM}"
         local app_framework_debug="iOSApp/Debug/App.framework"
         cp -r -- "${app_framework_debug}" "${BUILD_PATH}"
-    fi
 
-    app_plist_path=".ios/Flutter/AppFrameworkInfo.plist"
-    cp -- "${app_plist_path}" "${BUILD_PATH}/App.framework/Info.plist"
+        app_plist_path=".ios/Flutter/AppFrameworkInfo.plist"
+        cp -- "${app_plist_path}" "${BUILD_PATH}/App.framework/Info.plist"
+
+        local precompilation_flag=""
+        if [[ "$BUILD_MODE" != "debug" ]]; then
+            precompilation_flag="--precompiled"
+        fi
+
+        # build bundle
+        ${FLUTTER_ROOT}/bin/flutter --suppress-analytics \
+            --verbose \
+            build bundle \
+            --target-platform=ios \
+            --target="${target_path}" \
+            --${BUILD_MODE} \
+            --depfile="${BUILD_PATH}/snapshot_blob.bin.d" \
+            --asset-dir="${BUILD_PATH}/flutter_assets" \
+            ${precompilation_flag}
+
+        if [[ $? -ne 0 ]]; then
+            EchoError "Failed to build flutter assets"
+            exit -1
+        fi
+        
+        cp -rf -- "${BUILD_PATH}/flutter_assets" "${BUILD_PATH}/App.framework"
+    fi
 
     # copy flutter sdk
     local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
@@ -125,29 +141,6 @@ build_flutter_app() {
     cp -r -- "${BUILD_PATH}/App.framework" "${PRODUCT_APP_PATH}"
     cp -r -- "${flutter_framework}" "${PRODUCT_APP_PATH}"
     cp -r -- "${flutter_podspec}" "${PRODUCT_APP_PATH}"
-
-    local precompilation_flag=""
-    if [[ "$BUILD_MODE" != "debug" ]]; then
-        precompilation_flag="--precompiled"
-    fi
-
-    # build bundle
-    ${FLUTTER_ROOT}/bin/flutter --suppress-analytics \
-        --verbose \
-        build bundle \
-        --target-platform=ios \
-        --target="${target_path}" \
-        --${BUILD_MODE} \
-        --depfile="${BUILD_PATH}/snapshot_blob.bin.d" \
-        --asset-dir="${BUILD_PATH}/flutter_assets" \
-        ${precompilation_flag}
-
-    if [[ $? -ne 0 ]]; then
-        EchoError "Failed to build flutter assets"
-        exit -1
-    fi
-
-    cp -rf -- "${BUILD_PATH}/flutter_assets" "${PRODUCT_APP_PATH}/App.framework"
 
     # setting podspec
     # replace:
