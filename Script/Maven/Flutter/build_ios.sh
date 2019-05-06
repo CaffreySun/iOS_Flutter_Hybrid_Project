@@ -5,6 +5,7 @@ ARCHS_ARM="arm64,armv7"
 FLUTTER_ROOT=".flutter"
 PRODUCT_DIR="product"
 PRODUCT_ZIP="product.zip"
+FLUTTER_WRAPPER="./flutterw"
 
 BUILD_PATH=".build_ios/${BUILD_MODE}"
 PRODUCT_PATH="${BUILD_PATH}/${PRODUCT_DIR}"
@@ -30,8 +31,7 @@ flutter_get_packages() {
     echo "================================="
     echo "Start get flutter app plugin"
 
-    local flutter_wrapper="./flutterw"
-    if [ -e $flutter_wrapper ]; then
+    if [ -e $FLUTTER_WRAPPER ]; then
         echo 'flutterw installed' >/dev/null
     else
         bash -c "$(curl -fsSL https://raw.githubusercontent.com/passsy/flutter_wrapper/master/install.sh)"
@@ -41,7 +41,7 @@ flutter_get_packages() {
         fi
     fi
 
-    ${flutter_wrapper} packages get --verbose
+    ${FLUTTER_WRAPPER} packages get --verbose
     if [[ $? -ne 0 ]]; then
         EchoError "Failed to install flutter plugins."
         exit -1
@@ -92,9 +92,10 @@ build_flutter_app() {
 
         echo "Build archs: ${ARCHS_ARM}"
 
-        ${FLUTTER_ROOT}/bin/flutter clean
+        ${FLUTTER_WRAPPER} clean
 
-        ${FLUTTER_ROOT}/bin/flutter build ios --${BUILD_MODE}
+        ${FLUTTER_WRAPPER} build ios --${BUILD_MODE}
+        
         if [[ $? -ne 0 ]]; then
             EchoError "Failed to build flutter app"
             exit -1
@@ -115,7 +116,7 @@ build_flutter_app() {
         fi
 
         # build bundle
-        ${FLUTTER_ROOT}/bin/flutter --suppress-analytics \
+        ${FLUTTER_WRAPPER} --suppress-analytics \
             --verbose \
             build bundle \
             --target-platform=ios \
