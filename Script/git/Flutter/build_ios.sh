@@ -177,8 +177,12 @@ flutter_copy_packages() {
                 local plugin_path_ios="${plugin_path}ios"
                 if [ -e ${plugin_path_ios} ]; then
                     if [ -s ${plugin_path_ios} ]; then
-                        echo "copy plugin 'plugin_name' from '${plugin_path_ios}' to '${PRODUCT_PATH}/${plugin_name}'"
-                        cp -rf ${plugin_path_ios} "${PRODUCT_PATH}/${plugin_name}"
+						echo "copy plugin 'plugin_name' from '${plugin_path_ios}' to '${PRODUCT_PATH}/${plugin_name}'"
+						if [[ "${BUILD_MODE}" == "release" ]]; then
+							cp -rf ${plugin_path_ios} "${PRODUCT_PATH}/${plugin_name}"
+						else
+							ln -s ${plugin_path_ios} "${PRODUCT_PATH}/${plugin_name}"
+						fi
                     fi
                 fi
             fi

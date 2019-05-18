@@ -104,7 +104,7 @@ def install_release_flutter_app_pod(product_path)
             next
         end
 
-        sub_abs_path = File.join(product_path, sub)
+        sub_abs_path = File.realpath(File.join(product_path, sub))
         pod sub, :path=>sub_abs_path
     end
 
